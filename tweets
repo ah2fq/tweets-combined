@@ -26,10 +26,10 @@ def get_two_tweets(username1, username2, numtweets, filterRT):
     Y = get_tweets(username2, numtweets, filterRT)
     Y_model = mk.Text(Y)
     combined = mk.combine([X_model, Y_model], [1.2, 0.8])
+    return(combined)
 
 def generate_tweets(username1, username2, numtweets, numgeneratedtweets, filterRT):
-    tweets = get_two_tweets(username1, username2, numtweets, filterRT)
-    model = mk.Text(tweets)
+    model = get_two_tweets(username1, username2, numtweets, filterRT)
     for i in range(numgeneratedtweets):
         print(model.make_short_sentence(280))
         
