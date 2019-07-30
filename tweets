@@ -1,0 +1,37 @@
+import tweepy
+import pandas as pd
+import markovify as mk
+
+consumer_key = "KEY" 
+consumer_secret = "SECRET"
+access_key = "AKEY"
+access_secret = "ASECRET"
+
+def get_tweets(username, numtweets, filterRT):
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+
+    tmp = []
+    
+    for tweet in tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(numtweets):
+        tmp.append(tweet.full_text)
+    if filterRT == True:
+        tmp = filter(lambda x: 'RT @' not in x, tmp)
+    return(tmp)
+    
+def get_two_tweets(username1, username2, numtweets, filterRT):
+    X = get_tweets(username1, numtweets, filterRT) 
+    X_model = mk.Text(X)
+    Y = get_tweets(username2, numtweets, filterRT)
+    Y_model = mk.Text(Y)
+    combined = mk.combine([X_model, Y_model], [1.2, 0.8])
+
+def generate_tweets(username1, username2, numtweets, numgeneratedtweets, filterRT):
+    tweets = get_two_tweets(username1, username2, numtweets, filterRT)
+    model = mk.Text(tweets)
+    for i in range(numgeneratedtweets):
+        print(model.make_short_sentence(280))
+        
+        
+generate_tweets('ACCT1', 'ACCT2', 200, 5, True)
